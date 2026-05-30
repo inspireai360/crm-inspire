@@ -12,17 +12,31 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Demo mode: auto-login on mount
+  // Demo mode: auto-login on mount — silencioso, sin mostrar UI
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_DEMO_MODE !== 'true') return
     setLoading(true)
-    createClient().auth.signInWithPassword({
-      email: 'demo@inspireai.es',
-      password: 'InspireDemo2024!',
-    }).then(({ error }) => {
-      if (!error) { router.push('/dashboard'); router.refresh() }
-      else setLoading(false)
-    })
+
+    const tryLogin = async () => {
+      const sb = createClient()
+      // Cerrar cualquier sesión previa (evita conflicto de cookies)
+      await sb.auth.signOut()
+      // Esperar un tick para que se limpie la sesión
+      await new Promise(r => setTimeout(r, 200))
+      const { error } = await sb.auth.signInWithPassword({
+        email: 'demo@inspireai.es',
+        password: 'InspireDemo2024!',
+      })
+      if (!error) {
+        router.push('/dashboard')
+        router.refresh()
+      } else {
+        // Reintentar una vez si falla
+        setTimeout(tryLogin, 800)
+      }
+    }
+
+    tryLogin()
   }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -37,7 +51,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6" style={{ background: 'var(--bg)', opacity: loading ? 0 : 1, transition: 'opacity 0.2s' }}>
+    <div className="min-h-screen flex items-center justify-center p-6" style={{ background: 'var(--bg)', opacity: (loading && process.env.NEXT_PUBLIC_DEMO_MODE === 'true') ? 0 : 1, transition: 'opacity 0.3s' }}>
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-3 justify-center mb-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
