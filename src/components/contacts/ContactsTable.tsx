@@ -11,20 +11,27 @@ import Card from '@/components/ui/Card'
 interface Props { contacts: Contact[]; onDelete: (id: string) => void }
 
 const COLS = [
-  { key: 'name',    label: 'Nombre',          w: '26%' },
-  { key: 'type',    label: 'Tipo',             w: '13%' },
-  { key: 'company', label: 'Empresa',          w: '20%' },
-  { key: 'value',   label: 'Valor cuenta',     w: '16%', num: true },
-  { key: 'owner',   label: 'Responsable',      w: '11%' },
-  { key: 'created', label: 'Alta',             w: '14%' },
+  { key: 'name',       label: 'Nombre',       w: '24%' },
+  { key: 'type',       label: 'Tipo',         w: '12%' },
+  { key: 'company',    label: 'Empresa',      w: '18%' },
+  { key: 'value',      label: 'Valor',        w: '13%', num: true },
+  { key: 'owner',      label: 'Resp.',        w: '9%' },
+  { key: 'created_at', label: 'Registro',     w: '24%' },
 ]
+
+function fmtDateTime(iso: string): { date: string; time: string } {
+  const d = new Date(iso)
+  const date = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+  const time = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+  return { date, time }
+}
 
 const TYPE_LABELS: Record<string, string> = { all: 'Todos', lead: 'Leads', prospect: 'Prospectos', customer: 'Clientes' }
 
 export default function ContactsTable({ contacts, onDelete }: Props) {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<'all'|'lead'|'prospect'|'customer'>('all')
-  const [sort, setSort] = useState({ key: 'name', dir: 1 })
+  const [sort, setSort] = useState({ key: 'created_at', dir: -1 })
 
   const filtered = useMemo(() => {
     let r = contacts.filter(c =>
@@ -35,6 +42,7 @@ export default function ContactsTable({ contacts, onDelete }: Props) {
     r = [...r].sort((a, b) => {
       const av = sort.key === 'company' ? ((a as any).company?.name ?? '') : (a as any)[sort.key]
       const bv = sort.key === 'company' ? ((b as any).company?.name ?? '') : (b as any)[sort.key]
+      if (sort.key === 'created_at') return (new Date(av).getTime() - new Date(bv).getTime()) * sort.dir
       return typeof av === 'string' ? av.localeCompare(bv) * sort.dir : (av - bv) * sort.dir
     })
     return r
@@ -96,8 +104,15 @@ export default function ContactsTable({ contacts, onDelete }: Props) {
                 {fmtEuro(c.value)}
               </Link>
               <Link href={`/contacts/${c.id}`}><OwnerChip owner={c.owner} /></Link>
-              <div className="flex items-center justify-between text-[13px]" style={{ color: 'var(--t3)' }}>
-                <Link href={`/contacts/${c.id}`}>{new Date(c.created_at).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })}</Link>
+              <div className="flex items-center justify-between" style={{ color: 'var(--t3)' }}>
+                <Link href={`/contacts/${c.id}`} className="min-w-0">
+                  {(() => { const { date, time } = fmtDateTime(c.created_at); return (
+                    <div>
+                      <div className="text-[13px] font-[500]" style={{ color: 'var(--t2)' }}>{date}</div>
+                      <div className="text-[11.5px]" style={{ color: 'var(--t4)' }}>{time}</div>
+                    </div>
+                  )})()}
+                </Link>
                 <div className="flex items-center gap-1.5">
                   <button onClick={() => onDelete(c.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:text-red-400"
                     style={{ color: 'var(--t4)' }} title="Eliminar">
