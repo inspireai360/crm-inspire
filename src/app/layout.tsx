@@ -3,12 +3,12 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'InspireAI · CRM',
-  description: 'Revenue CRM powered by InspireAI',
+  description: 'CRM de InspireAI — Gestión de clientes y pipeline',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body>{children}</body>
     </html>
   )

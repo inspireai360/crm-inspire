@@ -4,20 +4,20 @@ import { usePathname } from 'next/navigation'
 import Icon from '@/components/ui/Icon'
 
 const TITLES: Record<string, string> = {
-  '/dashboard':  'Overview',
-  '/contacts':   'People',
-  '/pipeline':   'Deal flow',
-  '/deals':      'All deals',
-  '/activities': 'Timeline',
-  '/reports':    'Analytics',
-  '/inbox':      'Messages',
-  '/settings':   'Preferences',
+  '/dashboard':    'Inicio',
+  '/contacts':     'Contactos',
+  '/pipeline':     'Pipeline',
+  '/diagnosticos': 'Diagnósticos',
+  '/deals':        'Oportunidades',
+  '/activities':   'Actividades',
+  '/reports':      'Informes',
+  '/settings':     'Ajustes',
 }
 
 export default function Topbar() {
   const pathname = usePathname()
   const isContact = pathname.startsWith('/contacts/') && pathname !== '/contacts'
-  const title = isContact ? 'Contact' : (TITLES[pathname] ?? '')
+  const title = isContact ? 'Ficha de cliente' : (TITLES[pathname] ?? '')
 
   return (
     <header className="h-[60px] shrink-0 flex items-center justify-between px-[30px] sticky top-0 z-20"

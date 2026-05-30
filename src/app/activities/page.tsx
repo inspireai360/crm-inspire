@@ -9,11 +9,11 @@ import ActBubble from '@/components/ui/ActBubble'
 import { OwnerChip } from '@/components/ui/Avatar'
 
 const CHIPS = [
-  ['all', 'All'], ['call', 'Calls'], ['email', 'Emails'],
-  ['meeting', 'Meetings'], ['note', 'Notes'], ['deal', 'Deals'],
+  ['all','Todas'], ['call','Llamadas'], ['email','Emails'],
+  ['meeting','Reuniones'], ['note','Notas'], ['deal','Oportunidades'],
 ]
 
-export default function ActivitiesPage() {
+export default function ActividadesPage() {
   const [activities, setActivities] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
   const [type, setType] = useState('all')
@@ -30,9 +30,9 @@ export default function ActivitiesPage() {
 
   useEffect(() => { load() }, [load])
 
-  const filtered = activities.filter(a => type === 'all' || a.type === type)
-  const upcoming = filtered.filter(a => a.scheduled_at && new Date(a.scheduled_at) > new Date())
-  const recent   = filtered.filter(a => !a.scheduled_at || new Date(a.scheduled_at) <= new Date())
+  const filtered  = activities.filter(a => type === 'all' || a.type === type)
+  const proximas  = filtered.filter(a => a.scheduled_at && new Date(a.scheduled_at) > new Date())
+  const recientes = filtered.filter(a => !a.scheduled_at || new Date(a.scheduled_at) <= new Date())
 
   const Item = ({ a }: { a: Activity }) => (
     <button onClick={() => a.contact_id && router.push(`/contacts/${a.contact_id}`)}
@@ -46,11 +46,13 @@ export default function ActivitiesPage() {
       <OwnerChip owner={a.owner} />
       <div className="w-[92px] text-right shrink-0">
         <div className="text-[12.5px] font-[550]" style={{ color: 'var(--t2)' }}>
-          {a.scheduled_at ? new Date(a.scheduled_at).toLocaleDateString('en-US', { weekday: 'short' }) : new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+          {a.scheduled_at
+            ? new Date(a.scheduled_at).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })
+            : new Date(a.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
         </div>
         {a.scheduled_at && (
           <div className="text-[11.5px] mt-0.5" style={{ color: 'var(--t4)' }}>
-            {new Date(a.scheduled_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+            {new Date(a.scheduled_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
           </div>
         )}
       </div>
@@ -61,7 +63,7 @@ export default function ActivitiesPage() {
 
   return (
     <div className="animate-fade-up">
-      <PageHead title="Activities" sub="Everything happening across your accounts" />
+      <PageHead title="Actividades" sub="Todo lo que ocurre en tus cuentas" />
 
       <div className="flex gap-1 p-1 rounded-[11px] mb-5 w-fit" style={{ background: 'var(--s1)', boxShadow: 'inset 0 0 0 1px var(--line)' }}>
         {CHIPS.map(([k, label]) => (
@@ -73,35 +75,23 @@ export default function ActivitiesPage() {
         ))}
       </div>
 
-      {upcoming.length > 0 && (
+      {proximas.length > 0 && (
         <>
-          <div className="text-[12px] font-[600] uppercase tracking-[0.05em] mb-2 ml-1" style={{ color: 'var(--t3)' }}>Upcoming</div>
+          <div className="text-[12px] font-[600] uppercase tracking-[0.05em] mb-2 ml-1" style={{ color: 'var(--t3)' }}>Próximas</div>
           <Card pad={6} className="mb-[18px]">
-            {upcoming.map((a, i) => (
-              <div key={a.id} style={{ borderBottom: i < upcoming.length - 1 ? '1px solid var(--line)' : 'none' }}>
-                <Item a={a} />
-              </div>
-            ))}
+            {proximas.map((a, i) => <div key={a.id} style={{ borderBottom: i < proximas.length - 1 ? '1px solid var(--line)' : 'none' }}><Item a={a} /></div>)}
           </Card>
         </>
       )}
-
-      {recent.length > 0 && (
+      {recientes.length > 0 && (
         <>
-          <div className="text-[12px] font-[600] uppercase tracking-[0.05em] mb-2 ml-1" style={{ color: 'var(--t3)' }}>Recent</div>
+          <div className="text-[12px] font-[600] uppercase tracking-[0.05em] mb-2 ml-1" style={{ color: 'var(--t3)' }}>Recientes</div>
           <Card pad={6}>
-            {recent.map((a, i) => (
-              <div key={a.id} style={{ borderBottom: i < recent.length - 1 ? '1px solid var(--line)' : 'none' }}>
-                <Item a={a} />
-              </div>
-            ))}
+            {recientes.map((a, i) => <div key={a.id} style={{ borderBottom: i < recientes.length - 1 ? '1px solid var(--line)' : 'none' }}><Item a={a} /></div>)}
           </Card>
         </>
       )}
-
-      {filtered.length === 0 && (
-        <Card><div className="py-8 text-center text-[14px]" style={{ color: 'var(--t3)' }}>No activities of this type.</div></Card>
-      )}
+      {filtered.length === 0 && <Card><div className="py-8 text-center text-[14px]" style={{ color: 'var(--t3)' }}>Sin actividades de este tipo.</div></Card>}
     </div>
   )
 }

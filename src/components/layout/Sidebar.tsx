@@ -1,35 +1,33 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Icon from '@/components/ui/Icon'
 import { OwnerChip } from '@/components/ui/Avatar'
 import { createClient } from '@/lib/supabase/client'
 
 const NAV = [
-  { title: 'Workspace', items: [
-    { id: 'dashboard',  label: 'Dashboard',  icon: 'grid',     href: '/dashboard' },
-    { id: 'contacts',   label: 'Contacts',   icon: 'people',   href: '/contacts' },
-    { id: 'pipeline',   label: 'Pipeline',   icon: 'columns',  href: '/pipeline' },
-    { id: 'deals',      label: 'Deals',      icon: 'deal',     href: '/deals' },
-    { id: 'activities', label: 'Activities', icon: 'activity', href: '/activities' },
+  { title: 'Principal', items: [
+    { id: 'dashboard',    label: 'Inicio',          icon: 'grid',     href: '/dashboard' },
+    { id: 'contacts',     label: 'Contactos',        icon: 'people',   href: '/contacts' },
+    { id: 'pipeline',     label: 'Pipeline',         icon: 'columns',  href: '/pipeline' },
+    { id: 'diagnosticos', label: 'Diagnósticos',     icon: 'note',     href: '/diagnosticos' },
+    { id: 'deals',        label: 'Oportunidades',    icon: 'deal',     href: '/deals' },
+    { id: 'activities',   label: 'Actividades',      icon: 'activity', href: '/activities' },
   ]},
-  { title: 'Insights', items: [
-    { id: 'reports', label: 'Reports', icon: 'bars',  href: '/reports' },
-    { id: 'inbox',   label: 'Inbox',   icon: 'inbox', href: '/inbox', accent: true },
+  { title: 'Análisis', items: [
+    { id: 'reports', label: 'Informes', icon: 'bars', href: '/reports' },
   ]},
-  { title: 'Account', items: [
-    { id: 'settings', label: 'Settings', icon: 'tune', href: '/settings' },
+  { title: 'Cuenta', items: [
+    { id: 'settings', label: 'Ajustes', icon: 'tune', href: '/settings' },
   ]},
 ]
 
 interface SidebarProps {
   onNewDeal?: () => void
-  inboxUnread?: number
 }
 
-export default function Sidebar({ onNewDeal, inboxUnread = 0 }: SidebarProps) {
+export default function Sidebar({ onNewDeal }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -50,14 +48,14 @@ export default function Sidebar({ onNewDeal, inboxUnread = 0 }: SidebarProps) {
           </div>
           <div>
             <div className="text-[15px] font-bold tracking-tight">InspireAI</div>
-            <div className="text-[11px] font-medium tracking-wide" style={{ color: 'var(--t4)' }}>Revenue CRM</div>
+            <div className="text-[11px] font-medium tracking-wide" style={{ color: 'var(--t4)' }}>CRM</div>
           </div>
         </div>
 
-        {/* Create deal CTA */}
+        {/* Nueva oportunidad CTA */}
         <button onClick={onNewDeal} className="cta-btn w-full flex items-center justify-center gap-2 py-[11px] rounded-[11px] text-[13.5px] font-[600] text-white mb-6 transition-all"
           style={{ background: 'var(--accent)', boxShadow: '0 6px 18px -6px rgba(79,111,232,0.6)' }}>
-          <Icon name="plus" size={17} stroke={2} />Create deal
+          <Icon name="plus" size={17} stroke={2} />Nueva oportunidad
         </button>
       </div>
 
@@ -69,17 +67,12 @@ export default function Sidebar({ onNewDeal, inboxUnread = 0 }: SidebarProps) {
             <nav className="flex flex-col gap-[3px]">
               {sec.items.map(n => {
                 const active = pathname === n.href || (n.href !== '/dashboard' && pathname.startsWith(n.href))
-                const isInbox = n.id === 'inbox'
                 return (
                   <Link key={n.id} href={n.href} className="nav-item relative flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-[13.5px] font-[500] transition-all"
                     style={{ background: active ? 'var(--s3)' : 'transparent', color: active ? '#fff' : 'var(--t3)', boxShadow: active ? 'inset 0 0 0 1px var(--line2)' : 'none' }}>
                     {active && <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-[3px] h-[18px] rounded" style={{ background: 'var(--accent)' }} />}
                     <Icon name={n.icon} size={18} style={{ color: active ? 'var(--accent)' : 'inherit' }} />
                     <span className="flex-1">{n.label}</span>
-                    {isInbox && inboxUnread > 0 && (
-                      <span className="tnum min-w-[20px] h-5 px-1.5 rounded-[7px] grid place-items-center text-[11.5px] font-[600] text-white"
-                        style={{ background: 'var(--accent)' }}>{inboxUnread}</span>
-                    )}
                   </Link>
                 )
               })}
@@ -95,7 +88,7 @@ export default function Sidebar({ onNewDeal, inboxUnread = 0 }: SidebarProps) {
           <OwnerChip owner="AR" size={32} />
           <div className="min-w-0 flex-1">
             <div className="text-[13px] font-[550] truncate">Ana Reyes</div>
-            <div className="text-[11.5px]" style={{ color: 'var(--t4)' }}>Sign out</div>
+            <div className="text-[11.5px]" style={{ color: 'var(--t4)' }}>Cerrar sesión</div>
           </div>
           <Icon name="dots" size={16} style={{ color: 'var(--t4)' }} />
         </button>

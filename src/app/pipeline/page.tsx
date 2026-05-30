@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Deal, STAGE_PROB, fmtMoney } from '@/lib/types'
+import { Deal, STAGE_PROB, fmtEuro } from '@/lib/types'
 import KanbanBoard from '@/components/pipeline/KanbanBoard'
 import { PageHead } from '@/components/ui/Card'
 import Icon from '@/components/ui/Icon'
@@ -32,14 +32,13 @@ export default function PipelinePage() {
   }, [load])
 
   const handleStageChange = async (dealId: string, newStage: string) => {
-    // Optimistic update
     setDeals(ds => ds.map(d => d.id === dealId ? { ...d, stage: newStage as any } : d))
     const sb = createClient()
     await sb.from('deals').update({ stage: newStage }).eq('id', dealId)
   }
 
-  const total = deals.reduce((a, d) => a + d.value, 0)
-  const weighted = deals.reduce((a, d) => a + d.value * (STAGE_PROB[d.stage] / 100), 0)
+  const total = deals.reduce((a, d) => a + (d.precio_diagnostico ?? 0) + (d.precio_implementacion ?? 0), 0)
+  const weighted = deals.reduce((a, d) => a + ((d.precio_diagnostico ?? 0) + (d.precio_implementacion ?? 0)) * (STAGE_PROB[d.stage] / 100), 0)
 
   if (loading) return (
     <div className="flex items-center justify-center h-48">
@@ -51,8 +50,8 @@ export default function PipelinePage() {
     <div className="animate-fade-up h-full flex flex-col" style={{ height: 'calc(100vh - 120px)' }}>
       <PageHead
         title="Pipeline"
-        sub={`${deals.length} deals · ${fmtMoney(total)} total · ${fmtMoney(weighted)} weighted`}
-        right={<span className="text-[12.5px] flex items-center gap-1.5" style={{ color: 'var(--t3)' }}><Icon name="drag" size={15} />Drag cards to move stages</span>}
+        sub={`${deals.length} oportunidades · ${fmtEuro(total)} total · ${fmtEuro(weighted)} ponderado`}
+        right={<span className="text-[12.5px] flex items-center gap-1.5" style={{ color: 'var(--t3)' }}><Icon name="drag" size={15} />Arrastra las tarjetas para mover etapas</span>}
       />
       <div className="flex-1 min-h-0">
         <KanbanBoard

@@ -31,7 +31,7 @@ export default function ContactsPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this contact?')) return
+    if (!confirm('¿Eliminar este contacto?')) return
     const sb = createClient()
     await sb.from('contacts').delete().eq('id', id)
     load()
@@ -46,17 +46,17 @@ export default function ContactsPage() {
   return (
     <div className="animate-fade-up">
       <PageHead
-        title="Contacts"
-        sub={`${contacts.length} people across ${new Set(contacts.map(c => (c as any).company?.name).filter(Boolean)).size} companies`}
+        title="Contactos"
+        sub={`${contacts.length} personas en ${new Set(contacts.map(c => (c as any).company?.name).filter(Boolean)).size} empresas`}
         right={
           <button onClick={() => setShowForm(true)} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] text-[13.5px] font-[600] text-white"
             style={{ background: 'var(--accent)', boxShadow: '0 4px 14px -6px rgba(79,111,232,0.5)' }}>
-            <Icon name="plus" size={16} stroke={2} />New contact
+            <Icon name="plus" size={16} stroke={2} />Nuevo contacto
           </button>
         }
       />
       <ContactsTable contacts={contacts} onDelete={handleDelete} />
-      {showForm && <ContactForm title="New contact" onSubmit={handleCreate} onCancel={() => setShowForm(false)} />}
+      {showForm && <ContactForm title="Nuevo contacto" onSubmit={handleCreate} onCancel={() => setShowForm(false)} />}
     </div>
   )
 }

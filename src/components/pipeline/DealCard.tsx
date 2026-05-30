@@ -3,7 +3,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import Avatar, { OwnerChip } from '@/components/ui/Avatar'
-import { Deal, fmtMoney } from '@/lib/types'
+import { Deal, fmtEuro } from '@/lib/types'
 
 interface Props {
   deal: Deal
@@ -20,11 +20,12 @@ export default function DealCard({ deal, isDragging, onOpenContact }: Props) {
     opacity: isSortableDragging ? 0.4 : 1,
   }
 
-  const isWon = deal.stage === 'won'
+  const isCerrado = deal.stage === 'cerrado'
   // @ts-ignore
-  const contactName = deal.contact?.name ?? 'Unknown'
+  const contactName = deal.contact?.name ?? 'Desconocido'
   // @ts-ignore
   const companyName = deal.contact?.company?.name ?? ''
+  const total = (deal.precio_diagnostico ?? 0) + (deal.precio_implementacion ?? 0)
 
   return (
     <div
@@ -40,7 +41,9 @@ export default function DealCard({ deal, isDragging, onOpenContact }: Props) {
         <span className="text-[12px] truncate select-none" style={{ color: 'var(--t2)' }}>{companyName || contactName}</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="tnum text-[14px] font-[650] select-none" style={{ color: isWon ? '#9DB1F2' : '#fff' }}>{fmtMoney(deal.value)}</span>
+        <span className="tnum text-[14px] font-[650] select-none" style={{ color: isCerrado ? '#9DB1F2' : '#fff' }}>
+          {fmtEuro(total > 0 ? total : deal.value)}
+        </span>
         <OwnerChip owner={deal.owner} size={20} />
       </div>
     </div>

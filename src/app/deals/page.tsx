@@ -3,17 +3,17 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Deal, STAGES, STAGE_PROB, fmtMoney } from '@/lib/types'
+import { Deal, STAGES, STAGE_PROB, LEAD_SOURCES, fmtEuro } from '@/lib/types'
 import Card, { PageHead } from '@/components/ui/Card'
 import { StagePill } from '@/components/ui/Badge'
 import { OwnerChip } from '@/components/ui/Avatar'
 import Icon from '@/components/ui/Icon'
 
-export default function DealsPage() {
+export default function OportunidadesPage() {
   const [deals, setDeals] = useState<Deal[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
-  const [sort, setSort] = useState({ key: 'value', dir: -1 })
+  const [sort, setSort] = useState({ key: 'precio_diagnostico', dir: -1 })
   const router = useRouter()
 
   const load = useCallback(async () => {
@@ -28,42 +28,46 @@ export default function DealsPage() {
   const rows = useMemo(() => {
     let r = deals.filter(d => filter === 'all' || d.stage === filter)
     r = [...r].sort((a, b) => {
-      const av = sort.key === 'expected' ? a.value * STAGE_PROB[a.stage] : (a as any)[sort.key]
-      const bv = sort.key === 'expected' ? b.value * STAGE_PROB[b.stage] : (b as any)[sort.key]
+      const av = sort.key === 'expected'
+        ? (a.precio_diagnostico + a.precio_implementacion) * STAGE_PROB[a.stage] / 100
+        : (a as any)[sort.key]
+      const bv = sort.key === 'expected'
+        ? (b.precio_diagnostico + b.precio_implementacion) * STAGE_PROB[b.stage] / 100
+        : (b as any)[sort.key]
       return typeof av === 'string' ? av.localeCompare(bv) * sort.dir : (av - bv) * sort.dir
     })
     return r
   }, [deals, filter, sort])
 
   const toggle = (key: string) => setSort(s => s.key === key ? { key, dir: -s.dir } : { key, dir: key === 'title' ? 1 : -1 })
-  const total = deals.reduce((a, d) => a + d.value, 0)
-  const weighted = deals.reduce((a, d) => a + d.value * STAGE_PROB[d.stage] / 100, 0)
+  const totalDiag = deals.reduce((a, d) => a + (d.precio_diagnostico ?? 0), 0)
+  const totalImpl = deals.reduce((a, d) => a + (d.precio_implementacion ?? 0), 0)
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!confirm('Delete this deal?')) return
-    const sb = createClient()
-    await sb.from('deals').delete().eq('id', id)
+    if (!confirm('¿Eliminar esta oportunidad?')) return
+    await createClient().from('deals').delete().eq('id', id)
     load()
   }
 
   const COLS = [
-    { key: 'title',    label: 'Deal',     w: '30%' },
-    { key: 'stage',    label: 'Stage',    w: '16%' },
-    { key: 'value',    label: 'Value',    w: '15%', num: true },
-    { key: 'expected', label: 'Expected', w: '15%', num: true },
-    { key: 'owner',    label: 'Owner',    w: '10%' },
-    { key: '_',        label: '',         w: '14%' },
+    { key: 'title',              label: 'Oportunidad',        w: '24%' },
+    { key: 'stage',              label: 'Etapa',              w: '18%' },
+    { key: 'precio_diagnostico', label: 'Diagnóstico',        w: '13%', num: true },
+    { key: 'precio_implementacion',label: 'Implementación',   w: '14%', num: true },
+    { key: 'expected',           label: 'Esperado',           w: '13%', num: true },
+    { key: 'owner',              label: 'Resp.',               w: '8%' },
+    { key: '_',                  label: '',                   w: '10%' },
   ]
 
   if (loading) return <div className="flex items-center justify-center h-48"><div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--accent)', borderTopColor: 'transparent' }} /></div>
 
   return (
     <div className="animate-fade-up">
-      <PageHead title="Deals" sub={`${deals.length} deals · ${fmtMoney(total)} total · ${fmtMoney(weighted)} weighted`} />
+      <PageHead title="Oportunidades" sub={`${deals.length} oportunidades · Diag ${fmtEuro(totalDiag)} · Impl ${fmtEuro(totalImpl)}`} />
 
       <div className="flex gap-1 p-1 rounded-[11px] mb-[18px] w-fit flex-wrap" style={{ background: 'var(--s1)', boxShadow: 'inset 0 0 0 1px var(--line)' }}>
-        {[['all','All'], ...STAGES.map(s => [s.id, s.label])].map(([k, label]) => {
+        {[['all','Todas'], ...STAGES.map(s => [s.id, s.label])].map(([k, label]) => {
           const n = k === 'all' ? deals.length : deals.filter(d => d.stage === k).length
           return (
             <button key={k} onClick={() => setFilter(k)}
@@ -87,21 +91,31 @@ export default function DealsPage() {
         </div>
         {rows.map((d, i) => {
           // @ts-ignore
-          const company = d.contact?.company?.name ?? d.contact?.name ?? '—'
-          const exp = d.value * STAGE_PROB[d.stage] / 100
+          const empresa = d.contact?.company?.name ?? d.contact?.name ?? '—'
+          const exp = ((d.precio_diagnostico ?? 0) + (d.precio_implementacion ?? 0)) * STAGE_PROB[d.stage] / 100
           return (
             <div key={d.id} className="row-btn group grid items-center px-[22px] h-[62px] cursor-pointer transition-colors"
               style={{ gridTemplateColumns: COLS.map(c => c.w).join(' '), borderBottom: i < rows.length - 1 ? '1px solid var(--line)' : 'none' }}
               onClick={() => d.contact_id && router.push(`/contacts/${d.contact_id}`)}>
               <div className="min-w-0 pr-3">
                 <div className="text-[13.5px] font-[550] truncate">{d.title}</div>
-                <div className="text-[12px] truncate mt-0.5" style={{ color: 'var(--t3)' }}>{company}</div>
+                <div className="text-[12px] truncate mt-0.5 flex items-center gap-2" style={{ color: 'var(--t3)' }}>
+                  <span>{empresa}</span>
+                  {d.lead_source && <span className="px-1.5 py-0.5 rounded-md text-[10.5px]" style={{ background: 'var(--s3)' }}>{LEAD_SOURCES.find(l => l.value === d.lead_source)?.label}</span>}
+                </div>
               </div>
               <div><StagePill stage={d.stage} /></div>
-              <div className="tnum text-[14px] font-[600] text-right">{fmtMoney(d.value)}</div>
-              <div className="tnum text-[13.5px] font-[600] text-right" style={{ color: '#9DB1F2' }}>{fmtMoney(exp)}</div>
+              <div className="tnum text-[13.5px] font-[600] text-right">{fmtEuro(d.precio_diagnostico ?? 0)}</div>
+              <div className="tnum text-[13.5px] font-[600] text-right">{fmtEuro(d.precio_implementacion ?? 0)}</div>
+              <div className="tnum text-[13.5px] font-[600] text-right" style={{ color: '#9DB1F2' }}>{fmtEuro(exp)}</div>
               <div><OwnerChip owner={d.owner} /></div>
               <div className="flex justify-end items-center gap-2">
+                {d.notion_link && (
+                  <a href={d.notion_link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded" style={{ color: 'var(--t3)' }} title="Notion">
+                    <Icon name="external" size={14} />
+                  </a>
+                )}
                 <button onClick={e => handleDelete(d.id, e)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded" style={{ color: 'var(--t4)' }}>
                   <Icon name="trash" size={14} />
                 </button>
@@ -110,7 +124,7 @@ export default function DealsPage() {
             </div>
           )
         })}
-        {rows.length === 0 && <div className="py-12 text-center text-[14px]" style={{ color: 'var(--t3)' }}>No deals found.</div>}
+        {rows.length === 0 && <div className="py-12 text-center text-[14px]" style={{ color: 'var(--t3)' }}>Sin oportunidades.</div>}
       </Card>
     </div>
   )
