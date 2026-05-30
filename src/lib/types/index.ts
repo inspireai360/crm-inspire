@@ -1,7 +1,7 @@
 export type ContactType = 'lead' | 'prospect' | 'customer'
 export type DealStage   = 'lead_nuevo' | 'reunion_inicial' | 'diagnostico_activo' | 'propuesta_implementacion' | 'cliente_activo' | 'cerrado'
 export type ActivityType = 'call' | 'email' | 'meeting' | 'note' | 'deal' | 'demo' | 'review'
-export type Owner = 'AR' | 'JT' | 'MS'
+export type Owner = 'LL' | 'TI' | 'ME'
 export type LeadSource = 'web' | 'linkedin' | 'referido' | 'directo'
 export type AreaStatus = 'pendiente' | 'en_progreso' | 'completado'
 
@@ -101,10 +101,17 @@ export const STAGE_PROB: Record<DealStage, number> = {
   propuesta_implementacion: 65, cliente_activo: 85, cerrado: 100,
 }
 
-export const OWNERS: Record<Owner, { name: string; color: string }> = {
-  AR: { name: 'Ana Reyes',   color: '#4F6FE8' },
-  JT: { name: 'Jordan Tate', color: '#8E7BE8' },
-  MS: { name: 'Maya Singh',  color: '#3FA7A0' },
+export const OWNERS: Record<Owner, { name: string; role: string; color: string }> = {
+  LL: { name: 'Lluc',   role: 'CMO', color: '#4F6FE8' },
+  TI: { name: 'Timur',  role: 'CTO', color: '#8E7BE8' },
+  ME: { name: 'Merik',  role: 'COO', color: '#3FA7A0' },
+}
+
+// Mapeo email → owner (para identificar al usuario logueado)
+export const EMAIL_TO_OWNER: Record<string, Owner> = {
+  'monteslluc@gmail.com':  'LL',
+  'lluc@inspireai.com':    'LL',
+  // Añade aquí los emails de Timur y Merik cuando se registren
 }
 
 export const LEAD_SOURCES: { value: LeadSource; label: string }[] = [

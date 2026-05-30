@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Contact, Deal, Activity, STAGES, STAGE_PROB, AREAS, AREA_STATUSES, AreaStatus, fmtEuro } from '@/lib/types'
+import { Contact, Deal, Activity, STAGES, STAGE_PROB, AREAS, AREA_STATUSES, OWNERS, AreaStatus, fmtEuro } from '@/lib/types'
 import Card from '@/components/ui/Card'
 import Avatar, { OwnerChip } from '@/components/ui/Avatar'
 import { TypeBadge, StagePill } from '@/components/ui/Badge'
@@ -65,14 +65,14 @@ export default function ContactDetailPage() {
     if (!text?.trim()) return
     const sb = createClient()
     const { data: { user } } = await sb.auth.getUser()
-    await sb.from('activities').insert({ type: 'note', text, contact_id: id, owner: 'AR', user_id: user!.id })
+    await sb.from('activities').insert({ type: 'note', text, contact_id: id, owner: 'LL', user_id: user!.id })
     load()
   }
 
   if (loading) return <div className="flex items-center justify-center h-48"><div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--accent)', borderTopColor: 'transparent' }} /></div>
   if (!contact) return <div className="text-center py-12" style={{ color: 'var(--t3)' }}>Contacto no encontrado</div>
 
-  const owner = { AR: { name: 'Ana Reyes' }, JT: { name: 'Jordan Tate' }, MS: { name: 'Maya Singh' } }[contact.owner]
+  const owner = OWNERS[contact.owner as keyof typeof OWNERS]
   const latestDeal = deals[0]
 
   return (

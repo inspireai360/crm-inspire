@@ -40,7 +40,7 @@ interface OwnerChipProps {
 }
 
 export function OwnerChip({ owner, size = 22, color = '#4F6FE8' }: OwnerChipProps) {
-  const colors: Record<string, string> = { AR: '#4F6FE8', JT: '#8E7BE8', MS: '#3FA7A0' }
+  const colors: Record<string, string> = { LL: '#4F6FE8', TI: '#8E7BE8', ME: '#3FA7A0' }
   const c = colors[owner] ?? color
   return (
     <div title={owner} style={{

@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Card, { PageHead } from '@/components/ui/Card'
 import { OwnerChip } from '@/components/ui/Avatar'
 import Icon from '@/components/ui/Icon'
+import { createClient } from '@/lib/supabase/client'
+import { EMAIL_TO_OWNER, OWNERS, Owner } from '@/lib/types'
 
 function Toggle({ on, set }: { on: boolean; set: (v: boolean) => void }) {
   return (
@@ -15,8 +17,19 @@ function Toggle({ on, set }: { on: boolean; set: (v: boolean) => void }) {
 
 export default function AjustesPage() {
   const [notif, setNotif] = useState({ resumen: true, menciones: true, etapas: false, semanal: true })
+  const [email, setEmail] = useState('')
+  const [owner, setOwner] = useState<Owner | null>(null)
   const set = (k: string) => (v: boolean) => setNotif(s => ({ ...s, [k]: v }))
 
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      const e = data.user?.email ?? ''
+      setEmail(e)
+      setOwner(EMAIL_TO_OWNER[e] ?? null)
+    })
+  }, [])
+
+  const ownerInfo = owner ? OWNERS[owner] : null
   const inputCls = "w-full px-3.5 py-[10px] rounded-[10px] text-[14px] outline-none transition-shadow"
   const inputStyle = { background: 'var(--s2)', color: 'var(--t1)', boxShadow: 'inset 0 0 0 1px var(--line2)' }
 
@@ -37,27 +50,29 @@ export default function AjustesPage() {
         <Card pad={24}>
           <h3 className="text-[16px] font-[600] mb-[18px]">Perfil</h3>
           <div className="flex items-center gap-4 mb-[22px]">
-            <OwnerChip owner="AR" size={56} />
+            {owner && <OwnerChip owner={owner} size={56} />}
             <div>
-              <button className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[13px] font-[500] hover:opacity-80"
-                style={{ background: 'var(--s2)', boxShadow: 'inset 0 0 0 1px var(--line2)' }}>Cambiar foto</button>
-              <div className="text-[12px] mt-1.5" style={{ color: 'var(--t4)' }}>PNG o JPG, hasta 2 MB</div>
+              <div className="text-[15px] font-[600]">{ownerInfo?.name ?? email.split('@')[0]}</div>
+              <div className="text-[13px] mt-0.5" style={{ color: 'var(--t3)' }}>{ownerInfo?.role ?? ''} · InspireAI</div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3.5">
-            {[
-              { label: 'Nombre completo', value: 'Ana Reyes' },
-              { label: 'Rol', value: 'Account Executive' },
-              { label: 'Email', value: 'ana@inspireai.com' },
-              { label: 'Zona horaria', value: 'GMT+1 · Madrid' },
-            ].map(f => (
-              <label key={f.label}>
-                <div className="text-[12.5px] font-[550] mb-1.5" style={{ color: 'var(--t2)' }}>{f.label}</div>
-                <input defaultValue={f.value} className={inputCls} style={inputStyle}
-                  onFocus={e => (e.target.style.boxShadow = 'inset 0 0 0 1px var(--accent-l)')}
-                  onBlur={e => (e.target.style.boxShadow = 'inset 0 0 0 1px var(--line2)')} />
-              </label>
-            ))}
+            <label>
+              <div className="text-[12.5px] font-[550] mb-1.5" style={{ color: 'var(--t2)' }}>Nombre</div>
+              <input defaultValue={ownerInfo?.name ?? ''} className={inputCls} style={inputStyle}
+                onFocus={e => (e.target.style.boxShadow = 'inset 0 0 0 1px var(--accent-l)')}
+                onBlur={e => (e.target.style.boxShadow = 'inset 0 0 0 1px var(--line2)')} />
+            </label>
+            <label>
+              <div className="text-[12.5px] font-[550] mb-1.5" style={{ color: 'var(--t2)' }}>Rol</div>
+              <input defaultValue={ownerInfo?.role ?? ''} className={inputCls} style={inputStyle}
+                onFocus={e => (e.target.style.boxShadow = 'inset 0 0 0 1px var(--accent-l)')}
+                onBlur={e => (e.target.style.boxShadow = 'inset 0 0 0 1px var(--line2)')} />
+            </label>
+            <label className="col-span-2">
+              <div className="text-[12.5px] font-[550] mb-1.5" style={{ color: 'var(--t2)' }}>Email</div>
+              <input defaultValue={email} disabled className={inputCls} style={{ ...inputStyle, opacity: 0.6 }} />
+            </label>
           </div>
         </Card>
 
@@ -67,6 +82,26 @@ export default function AjustesPage() {
           <Row title="Menciones y respuestas" desc="Cuando un compañero te menciona o responde" k="menciones" />
           <Row title="Cambios de etapa" desc="Cuando un deal del que eres responsable cambia de fase" k="etapas" />
           <Row title="Informe semanal" desc="Resumen de rendimiento los lunes por email" k="semanal" />
+        </Card>
+
+        <Card pad={24}>
+          <h3 className="text-[16px] font-[600] mb-4">Equipo InspireAI</h3>
+          <div className="flex flex-col gap-3">
+            {(Object.entries(OWNERS) as [Owner, { name: string; role: string; color: string }][]).map(([k, o]) => (
+              <div key={k} className="flex items-center gap-3 py-2" style={{ borderBottom: '1px solid var(--line)' }}>
+                <OwnerChip owner={k} size={36} />
+                <div>
+                  <div className="text-[14px] font-[550]">{o.name}</div>
+                  <div className="text-[12.5px]" style={{ color: 'var(--t3)' }}>{o.role}</div>
+                </div>
+                {k === owner && <span className="ml-auto text-[12px] px-2.5 py-1 rounded-full font-[550]" style={{ background: 'rgba(79,111,232,0.14)', color: '#9DB1F2' }}>Tú</span>}
+              </div>
+            ))}
+          </div>
+          <p className="text-[12.5px] mt-4" style={{ color: 'var(--t3)' }}>
+            Para añadir un nuevo socio, comparte el enlace de registro:{' '}
+            <span className="font-[550]" style={{ color: '#9DB1F2' }}>crm-inspireai.vercel.app/register</span>
+          </p>
         </Card>
 
         <div className="flex justify-end gap-2.5">

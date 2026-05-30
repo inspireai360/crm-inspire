@@ -18,7 +18,7 @@ export default function ContactForm({ initial = {}, onSubmit, onCancel, title }:
     phone: initial.phone ?? '',
     role: initial.role ?? '',
     type: (initial.type ?? 'lead') as ContactType,
-    owner: (initial.owner ?? 'AR') as Owner,
+    owner: (initial.owner ?? 'LL') as Owner,
     location: initial.location ?? '',
     value: String(initial.value ?? 0),
   })
@@ -93,9 +93,9 @@ export default function ContactForm({ initial = {}, onSubmit, onCancel, title }:
             </Field>
             <Field label="Responsable">
               <select value={form.owner} onChange={e => set('owner', e.target.value)} className={inputCls} style={{ ...inputStyle, cursor: 'pointer' }}>
-                <option value="AR">Ana Reyes</option>
-                <option value="JT">Jordan Tate</option>
-                <option value="MS">Maya Singh</option>
+                <option value="LL">Lluc (CMO)</option>
+                <option value="TI">Timur (CTO)</option>
+                <option value="ME">Merik (COO)</option>
               </select>
             </Field>
           </div>

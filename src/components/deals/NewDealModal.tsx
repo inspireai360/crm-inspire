@@ -10,9 +10,9 @@ import Icon from '@/components/ui/Icon'
 interface Props { onClose: () => void; onCreated: (msg: string) => void }
 
 const OWNERS_LIST = [
-  { k: 'AR' as Owner, name: 'Ana Reyes' },
-  { k: 'JT' as Owner, name: 'Jordan Tate' },
-  { k: 'MS' as Owner, name: 'Maya Singh' },
+  { k: 'LL' as Owner, name: 'Lluc · CMO' },
+  { k: 'TI' as Owner, name: 'Timur · CTO' },
+  { k: 'ME' as Owner, name: 'Merik · COO' },
 ]
 
 export default function NewDealModal({ onClose, onCreated }: Props) {
@@ -20,7 +20,7 @@ export default function NewDealModal({ onClose, onCreated }: Props) {
   const [contacts, setContacts] = useState<Contact[]>([])
   const [form, setForm] = useState({
     title: '', contactId: '', precioDiag: '', precioImpl: '', descuento: '',
-    stage: 'lead_nuevo', owner: 'AR' as Owner, leadSource: '' as LeadSource | '',
+    stage: 'lead_nuevo', owner: 'LL' as Owner, leadSource: '' as LeadSource | '',
     notionLink: '',
   })
   const [contactQ, setContactQ] = useState('')

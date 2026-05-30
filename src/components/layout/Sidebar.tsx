@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import Icon from '@/components/ui/Icon'
-import { OwnerChip } from '@/components/ui/Avatar'
 import { createClient } from '@/lib/supabase/client'
+import { OWNERS, EMAIL_TO_OWNER, Owner } from '@/lib/types'
 
 const NAV = [
   { title: 'Principal', items: [
@@ -23,19 +24,43 @@ const NAV = [
   ]},
 ]
 
-interface SidebarProps {
-  onNewDeal?: () => void
+function UserAvatar({ owner, size = 32 }: { owner: Owner | null; size?: number }) {
+  const colors: Record<Owner, string> = { LL: '#4F6FE8', TI: '#8E7BE8', ME: '#3FA7A0' }
+  const color = owner ? colors[owner] : '#4F6FE8'
+  const label = owner ?? '?'
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', display: 'grid', placeItems: 'center',
+      background: 'var(--s3)', color, fontSize: size * 0.38, fontWeight: 600,
+      boxShadow: `inset 0 0 0 1.5px ${color}55`, flexShrink: 0,
+    }}>{label}</div>
+  )
 }
+
+interface SidebarProps { onNewDeal?: () => void }
 
 export default function Sidebar({ onNewDeal }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [owner, setOwner] = useState<Owner | null>(null)
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      const email = data.user?.email ?? null
+      setUserEmail(email)
+      if (email) setOwner(EMAIL_TO_OWNER[email] ?? null)
+    })
+  }, [])
 
   const handleLogout = async () => {
-    const sb = createClient()
-    await sb.auth.signOut()
+    await createClient().auth.signOut()
     router.push('/login')
   }
+
+  const ownerInfo = owner ? OWNERS[owner] : null
+  const displayName = ownerInfo?.name ?? userEmail?.split('@')[0] ?? 'Usuario'
+  const displayRole = ownerInfo?.role ?? ''
 
   return (
     <aside className="w-[244px] shrink-0 flex flex-col h-full" style={{ background: 'var(--s1)', borderRight: '1px solid var(--line)' }}>
@@ -68,7 +93,8 @@ export default function Sidebar({ onNewDeal }: SidebarProps) {
               {sec.items.map(n => {
                 const active = pathname === n.href || (n.href !== '/dashboard' && pathname.startsWith(n.href))
                 return (
-                  <Link key={n.id} href={n.href} className="nav-item relative flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-[13.5px] font-[500] transition-all"
+                  <Link key={n.id} href={n.href}
+                    className="nav-item relative flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-[13.5px] font-[500] transition-all"
                     style={{ background: active ? 'var(--s3)' : 'transparent', color: active ? '#fff' : 'var(--t3)', boxShadow: active ? 'inset 0 0 0 1px var(--line2)' : 'none' }}>
                     {active && <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-[3px] h-[18px] rounded" style={{ background: 'var(--accent)' }} />}
                     <Icon name={n.icon} size={18} style={{ color: active ? 'var(--accent)' : 'inherit' }} />
@@ -83,12 +109,13 @@ export default function Sidebar({ onNewDeal }: SidebarProps) {
 
       {/* User footer */}
       <div className="px-4 pb-[22px]">
-        <button onClick={handleLogout} className="w-full flex items-center gap-[11px] px-[10px] py-3 rounded-[12px] text-left hover:opacity-80 transition-opacity"
+        <button onClick={handleLogout}
+          className="w-full flex items-center gap-[11px] px-[10px] py-3 rounded-[12px] text-left hover:opacity-80 transition-opacity"
           style={{ background: 'var(--s2)', boxShadow: 'inset 0 0 0 1px var(--line)' }}>
-          <OwnerChip owner="AR" size={32} />
+          <UserAvatar owner={owner} size={32} />
           <div className="min-w-0 flex-1">
-            <div className="text-[13px] font-[550] truncate">Ana Reyes</div>
-            <div className="text-[11.5px]" style={{ color: 'var(--t4)' }}>Cerrar sesión</div>
+            <div className="text-[13px] font-[550] truncate">{displayName}{displayRole ? ` · ${displayRole}` : ''}</div>
+            <div className="text-[11.5px] truncate" style={{ color: 'var(--t4)' }}>{userEmail ?? 'Cerrar sesión'}</div>
           </div>
           <Icon name="dots" size={16} style={{ color: 'var(--t4)' }} />
         </button>
