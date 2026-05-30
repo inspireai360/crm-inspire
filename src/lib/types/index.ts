@@ -109,9 +109,11 @@ export const OWNERS: Record<Owner, { name: string; role: string; color: string }
 
 // Mapeo email → owner (para identificar al usuario logueado)
 export const EMAIL_TO_OWNER: Record<string, Owner> = {
-  'monteslluc@gmail.com':  'LL',
-  'lluc@inspireai.com':    'LL',
-  // Añade aquí los emails de Timur y Merik cuando se registren
+  'monteslluc@gmail.com': 'LL',
+  'lluc@inspireai.com':   'LL',
+  'Merikarpre@gmail.com': 'ME',
+  'merikarpre@gmail.com': 'ME',
+  // Añade el email de Timur cuando se registre
 }
 
 export const LEAD_SOURCES: { value: LeadSource; label: string }[] = [
