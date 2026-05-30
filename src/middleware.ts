@@ -22,8 +22,9 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const isAuth = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register')
+  const isAutoLogin = request.nextUrl.pathname.startsWith('/auto-login')
 
-  if (!user && !isAuth) {
+  if (!user && !isAuth && !isAutoLogin) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
   if (user && isAuth) {
