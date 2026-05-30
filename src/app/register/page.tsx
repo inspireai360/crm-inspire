@@ -37,14 +37,12 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center p-6" style={{ background: 'var(--bg)' }}>
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-3 justify-center mb-10">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent)', boxShadow: '0 6px 18px -6px rgba(79,111,232,0.7)' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M13 2 4.5 13H11l-1 9 9-11.5H12l1-8.5Z"/>
-            </svg>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="InspireAI" width={44} height={44}
+            style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', boxShadow: '0 4px 14px -4px rgba(79,111,232,0.5)' }} />
           <div>
-            <div className="text-[15px] font-bold tracking-tight">InspireAI</div>
-            <div className="text-[11px] font-medium tracking-wide" style={{ color: 'var(--t4)' }}>CRM</div>
+            <div className="text-[17px] font-bold tracking-tight">InspireAI</div>
+            <div className="text-[12px] font-medium tracking-wide" style={{ color: 'var(--t4)' }}>CRM</div>
           </div>
         </div>
 

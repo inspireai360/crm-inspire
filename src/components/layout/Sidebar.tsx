@@ -67,10 +67,20 @@ export default function Sidebar({ onNewDeal }: SidebarProps) {
       <div className="px-4 pt-[22px] pb-0">
         {/* Brand */}
         <div className="flex items-center gap-[11px] px-2 pb-[26px]">
-          <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center"
-            style={{ background: 'var(--accent)', boxShadow: '0 6px 18px -6px rgba(79,111,232,0.7)' }}>
-            <Icon name="spark" size={18} style={{ color: '#fff' }} />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png"
+            alt="InspireAI"
+            width={36}
+            height={36}
+            style={{
+              width: 36, height: 36,
+              borderRadius: '50%',
+              objectFit: 'cover',
+              flexShrink: 0,
+              boxShadow: '0 4px 14px -4px rgba(79,111,232,0.5)',
+            }}
+          />
           <div>
             <div className="text-[15px] font-bold tracking-tight">InspireAI</div>
             <div className="text-[11px] font-medium tracking-wide" style={{ color: 'var(--t4)' }}>CRM</div>
