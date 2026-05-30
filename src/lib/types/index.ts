@@ -51,10 +51,10 @@ export interface Deal {
   notion_link?: string
   fecha_inicio?: string
   fecha_entrega?: string
+  ventas_status: AreaStatus
   marketing_status: AreaStatus
-  delivery_status: AreaStatus
   operaciones_status: AreaStatus
-  fulfillment_status: AreaStatus
+  delivery_status: AreaStatus
   created_at: string
   updated_at: string
   user_id: string
@@ -121,11 +121,36 @@ export const AREA_STATUSES: { value: AreaStatus; label: string; color: string }[
 ]
 
 export const AREAS = [
-  { key: 'marketing_status',    label: 'Marketing' },
-  { key: 'delivery_status',     label: 'Delivery' },
-  { key: 'operaciones_status',  label: 'Operaciones' },
-  { key: 'fulfillment_status',  label: 'Fulfillment' },
+  { key: 'ventas_status',      label: 'Ventas' },
+  { key: 'marketing_status',   label: 'Marketing' },
+  { key: 'operaciones_status', label: 'Operaciones' },
+  { key: 'delivery_status',    label: 'Fulfillment / Delivery' },
 ] as const
+
+// Mapeo de áreas del cuestionario web → columna del deal
+export const WEB_AREA_TO_STATUS: Record<string, string> = {
+  ventas:                      'ventas_status',
+  marketing:                   'marketing_status',
+  operaciones:                 'operaciones_status',
+  delivery:                    'delivery_status',
+  fulfillment:                 'delivery_status',
+  administracion_documentacion:'operaciones_status',
+}
+
+export interface DiagnosticoRespuesta {
+  id: string
+  contact_id?: string
+  deal_id?: string
+  area: string
+  empresa?: string
+  contacto?: string
+  email?: string
+  telefono?: string
+  respuestas: Array<{ id: string; label: string; type: string; answer: string; section?: string }>
+  observaciones?: string
+  prioridad?: string
+  created_at: string
+}
 
 export const fmtMoney  = (n: number) => '$' + Math.round(n).toLocaleString('en-US')
 export const fmtMoneyK = (n: number) => n >= 1000 ? '$' + (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k' : '$' + n
