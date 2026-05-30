@@ -47,6 +47,14 @@ body {
 /* Tabular nums */
 .tnum { font-variant-numeric: tabular-nums; }
 
+/* Responsive table wrapper */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Hide on mobile */
+@media (max-width: 1023px) {
+  .lg\:hidden-col { display: none !important; }
+}
+
 /* Input reset */
 input, button, select, textarea { font-family: inherit; }
 

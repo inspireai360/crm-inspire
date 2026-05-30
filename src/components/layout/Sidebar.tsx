@@ -7,14 +7,16 @@ import Icon from '@/components/ui/Icon'
 import { createClient } from '@/lib/supabase/client'
 import { OWNERS, EMAIL_TO_OWNER, Owner } from '@/lib/types'
 
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 const NAV = [
   { title: 'Principal', items: [
-    { id: 'dashboard',    label: 'Inicio',          icon: 'grid',     href: '/dashboard' },
-    { id: 'contacts',     label: 'Contactos',        icon: 'people',   href: '/contacts' },
-    { id: 'pipeline',     label: 'Pipeline',         icon: 'columns',  href: '/pipeline' },
-    { id: 'diagnosticos', label: 'Diagnósticos',     icon: 'note',     href: '/diagnosticos' },
-    { id: 'deals',        label: 'Oportunidades',    icon: 'deal',     href: '/deals' },
-    { id: 'activities',   label: 'Actividades',      icon: 'activity', href: '/activities' },
+    { id: 'dashboard',    label: 'Inicio',       icon: 'grid',     href: '/dashboard' },
+    { id: 'contacts',     label: 'Contactos',    icon: 'people',   href: '/contacts' },
+    { id: 'pipeline',     label: 'Pipeline',     icon: 'columns',  href: '/pipeline' },
+    { id: 'diagnosticos', label: 'Diagnósticos', icon: 'note',     href: '/diagnosticos' },
+    { id: 'deals',        label: 'Oportunidades',icon: 'deal',     href: '/deals' },
+    { id: 'activities',   label: 'Actividades',  icon: 'activity', href: '/activities' },
   ]},
   { title: 'Análisis', items: [
     { id: 'reports', label: 'Informes', icon: 'bars', href: '/reports' },
@@ -27,25 +29,23 @@ const NAV = [
 function UserAvatar({ owner, size = 32 }: { owner: Owner | null; size?: number }) {
   const colors: Record<Owner, string> = { LL: '#4F6FE8', TI: '#8E7BE8', ME: '#3FA7A0' }
   const color = owner ? colors[owner] : '#4F6FE8'
-  const label = owner ?? '?'
   return (
-    <div style={{
-      width: size, height: size, borderRadius: '50%', display: 'grid', placeItems: 'center',
-      background: 'var(--s3)', color, fontSize: size * 0.38, fontWeight: 600,
-      boxShadow: `inset 0 0 0 1.5px ${color}55`, flexShrink: 0,
-    }}>{label}</div>
+    <div style={{ width: size, height: size, borderRadius: '50%', display: 'grid', placeItems: 'center', background: 'var(--s3)', color, fontSize: size * 0.38, fontWeight: 600, boxShadow: `inset 0 0 0 1.5px ${color}55`, flexShrink: 0 }}>
+      {owner ?? '?'}
+    </div>
   )
 }
 
-interface SidebarProps { onNewDeal?: () => void }
+interface SidebarProps { onNewDeal?: () => void; onClose?: () => void }
 
-export default function Sidebar({ onNewDeal }: SidebarProps) {
+export default function Sidebar({ onNewDeal, onClose }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [owner, setOwner] = useState<Owner | null>(null)
 
   useEffect(() => {
+    if (isDemo) { setUserEmail('demo@inspireai.es'); setOwner('LL'); return }
     createClient().auth.getUser().then(({ data }) => {
       const email = data.user?.email ?? null
       setUserEmail(email)
@@ -54,42 +54,40 @@ export default function Sidebar({ onNewDeal }: SidebarProps) {
   }, [])
 
   const handleLogout = async () => {
+    if (isDemo) { router.push('/login'); return }
     await createClient().auth.signOut()
     router.push('/login')
   }
 
+  const handleNavClick = () => { onClose?.() }
   const ownerInfo = owner ? OWNERS[owner] : null
   const displayName = ownerInfo?.name ?? userEmail?.split('@')[0] ?? 'Usuario'
-  const displayRole = ownerInfo?.role ?? ''
 
   return (
     <aside className="w-[244px] shrink-0 flex flex-col h-full" style={{ background: 'var(--s1)', borderRight: '1px solid var(--line)' }}>
       <div className="px-4 pt-[22px] pb-0">
-        {/* Brand */}
-        <div className="flex items-center gap-[11px] px-2 pb-[26px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo.png"
-            alt="InspireAI"
-            width={36}
-            height={36}
-            style={{
-              width: 36, height: 36,
-              borderRadius: '50%',
-              objectFit: 'cover',
-              flexShrink: 0,
-              boxShadow: '0 4px 14px -4px rgba(79,111,232,0.5)',
-            }}
-          />
-          <div>
-            <div className="text-[15px] font-bold tracking-tight">InspireAI</div>
-            <div className="text-[11px] font-medium tracking-wide" style={{ color: 'var(--t4)' }}>CRM</div>
+        {/* Header con botón cerrar en móvil */}
+        <div className="flex items-center justify-between px-2 pb-[26px]">
+          <div className="flex items-center gap-[11px]">
+            <img src="/logo.png" alt="InspireAI" width={34} height={34}
+              style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', boxShadow: '0 4px 14px -4px rgba(79,111,232,0.5)', flexShrink: 0 }} />
+            <div>
+              <div className="text-[15px] font-bold tracking-tight">InspireAI</div>
+              <div className="text-[11px] font-medium tracking-wide" style={{ color: 'var(--t4)' }}>CRM{isDemo ? ' · Demo' : ''}</div>
+            </div>
           </div>
+          {onClose && (
+            <button onClick={onClose} className="lg:hidden p-1.5 rounded-lg" style={{ color: 'var(--t3)' }}>
+              <Icon name="close" size={18} />
+            </button>
+          )}
         </div>
 
-        {/* Nueva oportunidad CTA */}
-        <button onClick={onNewDeal} className="cta-btn w-full flex items-center justify-center gap-2 py-[11px] rounded-[11px] text-[13.5px] font-[600] text-white mb-6 transition-all"
-          style={{ background: 'var(--accent)', boxShadow: '0 6px 18px -6px rgba(79,111,232,0.6)' }}>
+        {/* Nueva oportunidad */}
+        <button onClick={() => { onNewDeal?.(); onClose?.() }}
+          className={`cta-btn w-full flex items-center justify-center gap-2 py-[11px] rounded-[11px] text-[13.5px] font-[600] text-white mb-6 transition-all ${isDemo ? 'opacity-40 cursor-not-allowed' : ''}`}
+          style={{ background: 'var(--accent)', boxShadow: '0 6px 18px -6px rgba(79,111,232,0.6)' }}
+          disabled={isDemo} title={isDemo ? 'Desactivado en modo demo' : ''}>
           <Icon name="plus" size={17} stroke={2} />Nueva oportunidad
         </button>
       </div>
@@ -103,7 +101,7 @@ export default function Sidebar({ onNewDeal }: SidebarProps) {
               {sec.items.map(n => {
                 const active = pathname === n.href || (n.href !== '/dashboard' && pathname.startsWith(n.href))
                 return (
-                  <Link key={n.id} href={n.href}
+                  <Link key={n.id} href={n.href} onClick={handleNavClick}
                     className="nav-item relative flex items-center gap-3 px-3 py-[10px] rounded-[10px] text-[13.5px] font-[500] transition-all"
                     style={{ background: active ? 'var(--s3)' : 'transparent', color: active ? '#fff' : 'var(--t3)', boxShadow: active ? 'inset 0 0 0 1px var(--line2)' : 'none' }}>
                     {active && <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-[3px] h-[18px] rounded" style={{ background: 'var(--accent)' }} />}
@@ -117,15 +115,15 @@ export default function Sidebar({ onNewDeal }: SidebarProps) {
         ))}
       </div>
 
-      {/* User footer */}
+      {/* Footer */}
       <div className="px-4 pb-[22px]">
         <button onClick={handleLogout}
           className="w-full flex items-center gap-[11px] px-[10px] py-3 rounded-[12px] text-left hover:opacity-80 transition-opacity"
           style={{ background: 'var(--s2)', boxShadow: 'inset 0 0 0 1px var(--line)' }}>
           <UserAvatar owner={owner} size={32} />
           <div className="min-w-0 flex-1">
-            <div className="text-[13px] font-[550] truncate">{displayName}{displayRole ? ` · ${displayRole}` : ''}</div>
-            <div className="text-[11.5px] truncate" style={{ color: 'var(--t4)' }}>{userEmail ?? 'Cerrar sesión'}</div>
+            <div className="text-[13px] font-[550] truncate">{displayName}{ownerInfo?.role ? ` · ${ownerInfo.role}` : ''}</div>
+            <div className="text-[11.5px] truncate" style={{ color: 'var(--t4)' }}>{isDemo ? 'Modo demo' : 'Cerrar sesión'}</div>
           </div>
           <Icon name="dots" size={16} style={{ color: 'var(--t4)' }} />
         </button>

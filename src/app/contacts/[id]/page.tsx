@@ -81,9 +81,9 @@ export default function ContactDetailPage() {
         <Icon name="chevL" size={16} />Contactos
       </Link>
 
-      <div className="grid gap-[22px] items-start" style={{ gridTemplateColumns: '316px 1fr' }}>
+      <div className="grid gap-[22px] items-start grid-cols-1 lg:grid-cols-[316px_1fr]">
         {/* Sidebar sticky */}
-        <div className="sticky top-0 flex flex-col gap-3.5">
+        <div className="lg:sticky lg:top-0 flex flex-col gap-3.5">
 
           {/* Datos del contacto */}
           <Card pad={24}>

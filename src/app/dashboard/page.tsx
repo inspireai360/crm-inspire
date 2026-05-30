@@ -155,8 +155,8 @@ export default function DashboardPage() {
       <PageHead title="Inicio"
         sub={`${now.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})} · Estado del trimestre`} />
 
-      {/* 6 KPIs */}
-      <div className="grid grid-cols-6 gap-4 mb-4">
+      {/* 6 KPIs — 2 cols móvil, 3 tablet, 6 desktop */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 mb-4">
         <KpiCard label="Revenue Diagnósticos" value={fmtEuro(revDiag)}         delta={dRevDiag.label}  up={dRevDiag.up}  color="var(--accent)" />
         <KpiCard label="Revenue Implementaciones" value={fmtEuro(revImpl)}     delta={dRevImpl.label}  up={dRevImpl.up}  color="#8E7BE8" />
         <KpiCard label="Deals activos"         value={String(dealsActivos.length)} delta={dActivos.label} up={dActivos.up}  color="var(--good)" />
@@ -182,7 +182,7 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: '1.5fr 1fr' }}>
+      <div className="grid gap-4 mb-4 grid-cols-1 lg:grid-cols-[1.5fr_1fr]">
         {/* Pipeline por etapa */}
         <Card pad={22}>
           <div className="flex justify-between items-center mb-5">

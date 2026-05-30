@@ -34,5 +34,7 @@ const config: Config = {
     },
   },
   plugins: [],
+  // Ensure lg breakpoint is 1024px (default)
+
 };
 export default config;
