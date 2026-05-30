@@ -1,27 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg:        #0A0A1A;
+  --s1:        #111122;
+  --s2:        #1A1A2E;
+  --s3:        #20203a;
+  --accent:    #4F6FE8;
+  --accent-s:  rgba(79,111,232,0.14);
+  --accent-l:  rgba(79,111,232,0.35);
+  --t1:        #FFFFFF;
+  --t2:        rgba(255,255,255,0.66);
+  --t3:        rgba(255,255,255,0.42);
+  --t4:        rgba(255,255,255,0.26);
+  --line:      rgba(255,255,255,0.07);
+  --line2:     rgba(255,255,255,0.12);
+  --good:      #3FB984;
+  --warn:      #E8A24F;
+  --bad:       #E86F6F;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #__next { height: 100%; }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--t1);
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.011em;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.09); border-radius: 20px; border: 3px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.16); }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* Selection */
+::selection { background: var(--accent-l); color: #fff; }
+
+/* Tabular nums */
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* Input reset */
+input, button, select, textarea { font-family: inherit; }
+
+/* Row hover */
+.row-btn:hover { background: rgba(255,255,255,0.028) !important; }
+.row-btn:hover .row-arrow { opacity: 1 !important; }
+
+/* Deal card hover */
+.deal-card:hover { transform: translateY(-2px); box-shadow: 0 10px 26px -10px rgba(0,0,0,0.6), inset 0 0 0 1px var(--accent-l) !important; }
+
+/* Nav hover */
+.nav-item:hover { background: var(--s2) !important; color: rgba(255,255,255,0.85) !important; }
+
+/* CTA button hover */
+.cta-btn:hover { background: #5E7CEC !important; box-shadow: 0 10px 26px -6px rgba(79,111,232,0.7) !important; }

@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# InspireAI · Revenue CRM
 
-## Getting Started
+Full-stack CRM built with **Next.js 14 · TypeScript · Tailwind CSS · Supabase**.
 
-First, run the development server:
+## Stack
+
+| Layer | Tech |
+|-------|------|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript |
+| Styles | Tailwind CSS + CSS variables |
+| Backend / Auth | Supabase (PostgreSQL + RLS + Realtime) |
+| Drag & drop | @dnd-kit/core + @dnd-kit/sortable |
+
+## Setup
+
+### 1. Create a Supabase project
+
+Go to [supabase.com](https://supabase.com), create a new project.
+
+### 2. Run the schema
+
+In the Supabase SQL editor, run the contents of `supabase/schema.sql`.
+
+### 3. Environment variables
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.local.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Fill in `.env.local`:
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Install & run
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000), register, and start using the CRM.
 
-To learn more about Next.js, take a look at the following resources:
+### 5. Seed data (optional)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+After your first login, run `supabase/seed.sql` in the SQL editor to populate with sample contacts, deals, and activities.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Features
 
-## Deploy on Vercel
+- **Auth** — Email + password via Supabase Auth, protected by Next.js middleware
+- **Dashboard** — Live KPIs, pipeline-by-stage bars, activity feed (Supabase Realtime subscriptions)
+- **Contacts** — Full CRUD, search, type filter (lead/prospect/customer), sortable columns
+- **Contact Detail** — Sticky sidebar, open deals list, activity timeline, inline note creation
+- **Pipeline** — Kanban board with drag & drop (@dnd-kit), real-time stage updates to Supabase
+- **Deals** — List view, stage filter tabs, expected value column, sortable
+- **Activities** — Type-filtered feed (calls, emails, meetings, notes, deals), upcoming vs recent
+- **Reports** — Revenue area chart, win-rate donut, rep leaderboard, deals-by-stage bar chart
+- **Inbox** — Two-pane email reader, mark-read on open, links to contact detail
+- **Settings** — Profile fields, notification toggles
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Design
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Dark mode exactly matching the handoff:
+- Background: `#0A0A1A`
+- Surfaces: `#111122` / `#1A1A2E` / `#20203a`
+- Accent: `#4F6FE8`
+- Typography: Inter
