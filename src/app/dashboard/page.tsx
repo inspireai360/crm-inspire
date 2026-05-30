@@ -142,13 +142,16 @@ export default function DashboardPage() {
     </div>
   )
 
-  const dRevDiag  = calcDelta(revDiag, revDiagPrev)
-  const dRevImpl  = calcDelta(revImpl, revImplPrev)
-  const dActivos  = calcDeltaAbs(dealsActivos.length, dealsMesAnterior.filter(d => d.stage !== 'cerrado').length)
-  const dClose    = calcDeltaAbs(closeRate, closeRatePrev)
-  const dTkDiag   = calcDelta(ticketDiag, ticketDiagPrev)
-  const dTkImpl   = calcDelta(ticketImpl, ticketImplPrev)
-  const dEntregados = calcDeltaAbs(entregadosMes, entregadosPrevMes)
+  const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
+  // En demo usamos deltas simulados realistas para que la pantalla tenga sentido
+  const dRevDiag  = isDemo ? { label: '+22%',  up: true  } : calcDelta(revDiag, revDiagPrev)
+  const dRevImpl  = isDemo ? { label: '+31%',  up: true  } : calcDelta(revImpl, revImplPrev)
+  const dActivos  = isDemo ? { label: '+2',    up: true  } : calcDeltaAbs(dealsActivos.length, dealsMesAnterior.filter(d => d.stage !== 'cerrado').length)
+  const dClose    = isDemo ? { label: '+8pt',  up: true  } : calcDeltaAbs(closeRate, closeRatePrev)
+  const dTkDiag   = isDemo ? { label: '+12%',  up: true  } : calcDelta(ticketDiag, ticketDiagPrev)
+  const dTkImpl   = isDemo ? { label: '+18%',  up: true  } : calcDelta(ticketImpl, ticketImplPrev)
+  const dEntregados = isDemo ? { label: '+1', up: true } : calcDeltaAbs(entregadosMes, entregadosPrevMes)
 
   return (
     <div className="animate-fade-up">
