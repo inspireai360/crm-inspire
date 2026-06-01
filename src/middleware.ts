@@ -25,7 +25,9 @@ export async function middleware(request: NextRequest) {
   const isAutoLogin = request.nextUrl.pathname.startsWith('/auto-login')
 
   if (!user && !isAuth && !isAutoLogin) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    // En modo demo, redirigir siempre a /auto-login en vez del formulario de login
+    const dest = process.env.NEXT_PUBLIC_DEMO_MODE === 'true' ? '/auto-login' : '/login'
+    return NextResponse.redirect(new URL(dest, request.url))
   }
   if (user && isAuth) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
