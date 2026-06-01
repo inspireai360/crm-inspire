@@ -19,15 +19,18 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // Demo público — sin autenticación requerida
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    return supabaseResponse
+  }
+
   const { data: { user } } = await supabase.auth.getUser()
 
   const isAuth = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register')
   const isAutoLogin = request.nextUrl.pathname.startsWith('/auto-login')
 
   if (!user && !isAuth && !isAutoLogin) {
-    // En modo demo, redirigir siempre a /auto-login en vez del formulario de login
-    const dest = process.env.NEXT_PUBLIC_DEMO_MODE === 'true' ? '/auto-login' : '/login'
-    return NextResponse.redirect(new URL(dest, request.url))
+    return NextResponse.redirect(new URL('/login', request.url))
   }
   if (user && isAuth) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
