@@ -7,20 +7,24 @@ import ContactsTable from '@/components/contacts/ContactsTable'
 import ContactForm from '@/components/contacts/ContactForm'
 import { PageHead } from '@/components/ui/Card'
 import Icon from '@/components/ui/Icon'
+import { DEMO_CONTACTS } from '@/lib/demo-data'
+
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
 
 export default function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>([])
-  const [loading, setLoading] = useState(true)
+  const [contacts, setContacts] = useState<Contact[]>(isDemo ? DEMO_CONTACTS : [])
+  const [loading, setLoading] = useState(!isDemo)
   const [showForm, setShowForm] = useState(false)
 
   const load = useCallback(async () => {
+    if (isDemo) return
     const sb = createClient()
     const { data } = await sb.from('contacts').select('*, company:companies(id,name)').order('created_at', { ascending: false })
     setContacts(data ?? [])
     setLoading(false)
   }, [])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { if (!isDemo) load() }, [load])
 
   const handleCreate = async (data: Partial<Contact>) => {
     const sb = createClient()

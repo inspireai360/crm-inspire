@@ -8,22 +8,26 @@ import Card, { PageHead } from '@/components/ui/Card'
 import { StagePill } from '@/components/ui/Badge'
 import { OwnerChip } from '@/components/ui/Avatar'
 import Icon from '@/components/ui/Icon'
+import { DEMO_DEALS } from '@/lib/demo-data'
+
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
 
 export default function OportunidadesPage() {
-  const [deals, setDeals] = useState<Deal[]>([])
-  const [loading, setLoading] = useState(true)
+  const [deals, setDeals] = useState<Deal[]>(isDemo ? DEMO_DEALS : [])
+  const [loading, setLoading] = useState(!isDemo)
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState({ key: 'precio_diagnostico', dir: -1 })
   const router = useRouter()
 
   const load = useCallback(async () => {
+    if (isDemo) return
     const sb = createClient()
     const { data } = await sb.from('deals').select('*, contact:contacts(name,company:companies(name))').order('created_at', { ascending: false })
     setDeals(data ?? [])
     setLoading(false)
   }, [])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { if (!isDemo) load() }, [load])
 
   const rows = useMemo(() => {
     let r = deals.filter(d => filter === 'all' || d.stage === filter)

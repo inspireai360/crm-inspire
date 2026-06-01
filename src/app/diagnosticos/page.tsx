@@ -7,6 +7,10 @@ import { Deal, DiagnosticoRespuesta, AREAS, AREA_STATUSES, AreaStatus, fmtEuro }
 import Card, { PageHead } from '@/components/ui/Card'
 import Avatar, { OwnerChip } from '@/components/ui/Avatar'
 import Icon from '@/components/ui/Icon'
+import { DEMO_DEALS } from '@/lib/demo-data'
+
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+const DEMO_DIAG_DEALS = DEMO_DEALS.filter(d => ['diagnostico_activo','propuesta_implementacion','cliente_activo','cerrado'].includes(d.stage))
 
 const STATUS_COLOR: Record<AreaStatus, string> = {
   pendiente:   'rgba(255,255,255,0.26)',
@@ -28,13 +32,14 @@ const AREA_WEB_LABEL: Record<string, string> = {
 }
 
 export default function DiagnosticosPage() {
-  const [deals, setDeals] = useState<Deal[]>([])
+  const [deals, setDeals] = useState<Deal[]>(isDemo ? DEMO_DIAG_DEALS : [])
   const [respuestas, setRespuestas] = useState<DiagnosticoRespuesta[]>([])
   const [expanded, setExpanded] = useState<Record<string, string | null>>({})
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!isDemo)
   const router = useRouter()
 
   const load = useCallback(async () => {
+    if (isDemo) return
     const sb = createClient()
     const [{ data: d }, { data: r }] = await Promise.all([
       sb.from('deals')
@@ -50,7 +55,7 @@ export default function DiagnosticosPage() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { if (!isDemo) load() }, [load])
 
   const updateAreaStatus = async (dealId: string, area: string, status: AreaStatus) => {
     const sb = createClient()

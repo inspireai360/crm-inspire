@@ -7,19 +7,23 @@ import { Activity } from '@/lib/types'
 import Card, { PageHead } from '@/components/ui/Card'
 import ActBubble from '@/components/ui/ActBubble'
 import { OwnerChip } from '@/components/ui/Avatar'
+import { DEMO_ACTIVITIES } from '@/lib/demo-data'
 
 const CHIPS = [
   ['all','Todas'], ['call','Llamadas'], ['email','Emails'],
   ['meeting','Reuniones'], ['note','Notas'], ['deal','Oportunidades'],
 ]
 
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 export default function ActividadesPage() {
-  const [activities, setActivities] = useState<Activity[]>([])
-  const [loading, setLoading] = useState(true)
+  const [activities, setActivities] = useState<Activity[]>(isDemo ? DEMO_ACTIVITIES : [])
+  const [loading, setLoading] = useState(!isDemo)
   const [type, setType] = useState('all')
   const router = useRouter()
 
   const load = useCallback(async () => {
+    if (isDemo) return
     const sb = createClient()
     const { data } = await sb.from('activities')
       .select('*, contact:contacts(id,name,company:companies(name))')
@@ -28,7 +32,7 @@ export default function ActividadesPage() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { if (!isDemo) load() }, [load])
 
   const filtered  = activities.filter(a => type === 'all' || a.type === type)
   const proximas  = filtered.filter(a => a.scheduled_at && new Date(a.scheduled_at) > new Date())
