@@ -10,9 +10,6 @@ export default function AutoLoginPage() {
 
   useEffect(() => {
     const login = async () => {
-      const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
-      if (!isDemo) { router.push('/login'); return }
-
       const sb = createClient()
       const { error } = await sb.auth.signInWithPassword({
         email: 'demo@inspireai.es',
