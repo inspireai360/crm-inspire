@@ -8,12 +8,12 @@ import Card, { PageHead } from '@/components/ui/Card'
 import { StagePill } from '@/components/ui/Badge'
 import { OwnerChip } from '@/components/ui/Avatar'
 import Icon from '@/components/ui/Icon'
-import { DEMO_DEALS } from '@/lib/demo-data'
+import { demoStore } from '@/lib/demo-store'
 
 const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
 
 export default function OportunidadesPage() {
-  const [deals, setDeals] = useState<Deal[]>(isDemo ? DEMO_DEALS : [])
+  const [deals, setDeals] = useState<Deal[]>(isDemo ? demoStore.getDeals() : [])
   const [loading, setLoading] = useState(!isDemo)
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState({ key: 'precio_diagnostico', dir: -1 })

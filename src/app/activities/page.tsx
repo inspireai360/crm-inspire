@@ -7,7 +7,7 @@ import { Activity } from '@/lib/types'
 import Card, { PageHead } from '@/components/ui/Card'
 import ActBubble from '@/components/ui/ActBubble'
 import { OwnerChip } from '@/components/ui/Avatar'
-import { DEMO_ACTIVITIES } from '@/lib/demo-data'
+import { demoStore } from '@/lib/demo-store'
 
 const CHIPS = [
   ['all','Todas'], ['call','Llamadas'], ['email','Emails'],
@@ -17,13 +17,13 @@ const CHIPS = [
 const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
 
 export default function ActividadesPage() {
-  const [activities, setActivities] = useState<Activity[]>(isDemo ? DEMO_ACTIVITIES : [])
+  const [activities, setActivities] = useState<Activity[]>(isDemo ? demoStore.getActivities() : [])
   const [loading, setLoading] = useState(!isDemo)
   const [type, setType] = useState('all')
   const router = useRouter()
 
   const load = useCallback(async () => {
-    if (isDemo) return
+    if (isDemo) { setActivities(demoStore.getActivities()); return }
     const sb = createClient()
     const { data } = await sb.from('activities')
       .select('*, contact:contacts(id,name,company:companies(name))')

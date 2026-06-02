@@ -53,27 +53,13 @@ function KpiCard({ label, value, delta, up, color }: KpiCardProps) {
   )
 }
 
-const DEMO_DEALS: Deal[] = [
-  { id:'d1', title:'Inspire Cyber 360 — Torres & Asociados', stage:'cliente_activo', value:4500, owner:'LL', precio_diagnostico:4500, precio_implementacion:12000, descuento_aplicado:0, ventas_status:'completado', marketing_status:'completado', operaciones_status:'en_progreso', delivery_status:'pendiente', created_at:'2026-05-01T10:00:00Z', updated_at:'2026-05-28T10:00:00Z', user_id:'demo', position:0, lead_source:'linkedin' },
-  { id:'d2', title:'Inspire Cyber 360 — Clínica Martínez', stage:'diagnostico_activo', value:2800, owner:'ME', precio_diagnostico:2800, precio_implementacion:8500, descuento_aplicado:0, ventas_status:'completado', marketing_status:'en_progreso', operaciones_status:'pendiente', delivery_status:'pendiente', created_at:'2026-05-10T10:00:00Z', updated_at:'2026-05-25T10:00:00Z', user_id:'demo', position:1, lead_source:'referido' },
-  { id:'d3', title:'Inspire Cyber 360 — Logística Ibérica', stage:'propuesta_implementacion', value:6200, owner:'TI', precio_diagnostico:6200, precio_implementacion:18000, descuento_aplicado:0, ventas_status:'completado', marketing_status:'completado', operaciones_status:'completado', delivery_status:'en_progreso', created_at:'2026-04-15T10:00:00Z', updated_at:'2026-05-20T10:00:00Z', user_id:'demo', position:2, lead_source:'web' },
-  { id:'d4', title:'Inspire Cyber 360 — Estudio Vidal', stage:'reunion_inicial', value:1800, owner:'LL', precio_diagnostico:1800, precio_implementacion:5500, descuento_aplicado:0, ventas_status:'en_progreso', marketing_status:'pendiente', operaciones_status:'pendiente', delivery_status:'pendiente', created_at:'2026-05-20T10:00:00Z', updated_at:'2026-05-22T10:00:00Z', user_id:'demo', position:3, lead_source:'directo' },
-  { id:'d5', title:'Inspire Cyber 360 — Distribuidora Sur', stage:'cerrado', value:3200, owner:'ME', precio_diagnostico:3200, precio_implementacion:9800, descuento_aplicado:0, ventas_status:'completado', marketing_status:'completado', operaciones_status:'completado', delivery_status:'completado', created_at:'2026-04-01T10:00:00Z', updated_at:'2026-05-05T10:00:00Z', user_id:'demo', position:4, lead_source:'linkedin', notion_link:'https://notion.so/demo', fecha_entrega:'2026-06-01' },
-]
-
-const DEMO_ACTIVITIES: Activity[] = [
-  { id:'a1', type:'meeting', text:'Kickoff con Torres & Asociados. Accesos recibidos, empezamos cuestionarios esta semana.', owner:'LL', created_at: new Date(Date.now()-1*86400000).toISOString(), user_id:'demo', contact: { id:'c1', name:'Carlos Torres', company: { id:'co1', name:'Torres & Asociados', created_at:'', user_id:'demo' }, type:'customer', owner:'LL', value:4500, created_at:'', updated_at:'', user_id:'demo' } } as unknown as Activity,
-  { id:'a2', type:'deal', text:'Deal Logística Ibérica avanzado a Propuesta de Implementación.', owner:'TI', created_at: new Date(Date.now()-3*86400000).toISOString(), user_id:'demo', contact: { id:'c3', name:'Javier Ruiz', company: { id:'co3', name:'Logística Ibérica', created_at:'', user_id:'demo' }, type:'prospect', owner:'TI', value:6200, created_at:'', updated_at:'', user_id:'demo' } } as unknown as Activity,
-  { id:'a3', type:'email', text:'Propuesta enviada a Logística Ibérica con dos opciones de alcance.', owner:'TI', created_at: new Date(Date.now()-4*86400000).toISOString(), user_id:'demo', contact: { id:'c3', name:'Javier Ruiz', company: { id:'co3', name:'Logística Ibérica', created_at:'', user_id:'demo' }, type:'prospect', owner:'TI', value:6200, created_at:'', updated_at:'', user_id:'demo' } } as unknown as Activity,
-  { id:'a4', type:'call', text:'Llamada con Ana Martínez. Dolor principal: gestión de citas y seguimiento post-visita.', owner:'ME', created_at: new Date(Date.now()-6*86400000).toISOString(), user_id:'demo', contact: { id:'c2', name:'Ana Martínez', company: { id:'co2', name:'Clínica Martínez', created_at:'', user_id:'demo' }, type:'prospect', owner:'ME', value:2800, created_at:'', updated_at:'', user_id:'demo' } } as unknown as Activity,
-  { id:'a5', type:'review', text:'Reunión de entrega con Distribuidora Sur. NPS: 10/10. Firmado upsell de implementación.', owner:'ME', created_at: new Date(Date.now()-8*86400000).toISOString(), user_id:'demo', contact: { id:'c5', name:'Miguel Herrera', company: { id:'co5', name:'Distribuidora Sur', created_at:'', user_id:'demo' }, type:'customer', owner:'ME', value:3200, created_at:'', updated_at:'', user_id:'demo' } } as unknown as Activity,
-]
+import { demoStore } from '@/lib/demo-store'
 
 const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
 
 export default function DashboardPage() {
-  const [deals, setDeals] = useState<Deal[]>(isDemo ? DEMO_DEALS : [])
-  const [activities, setActivities] = useState<Activity[]>(isDemo ? DEMO_ACTIVITIES : [])
+  const [deals, setDeals] = useState<Deal[]>(isDemo ? demoStore.getDeals() : [])
+  const [activities, setActivities] = useState<Activity[]>(isDemo ? demoStore.getActivities() : [])
   const [loading, setLoading] = useState(!isDemo)
 
   const load = useCallback(async () => {

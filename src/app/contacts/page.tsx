@@ -7,17 +7,17 @@ import ContactsTable from '@/components/contacts/ContactsTable'
 import ContactForm from '@/components/contacts/ContactForm'
 import { PageHead } from '@/components/ui/Card'
 import Icon from '@/components/ui/Icon'
-import { DEMO_CONTACTS } from '@/lib/demo-data'
+import { demoStore } from '@/lib/demo-store'
 
 const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
 
 export default function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>(isDemo ? DEMO_CONTACTS : [])
+  const [contacts, setContacts] = useState<Contact[]>(isDemo ? demoStore.getContacts() : [])
   const [loading, setLoading] = useState(!isDemo)
   const [showForm, setShowForm] = useState(false)
 
   const load = useCallback(async () => {
-    if (isDemo) return
+    if (isDemo) { setContacts(demoStore.getContacts()); return }
     const sb = createClient()
     const { data } = await sb.from('contacts').select('*, company:companies(id,name)').order('created_at', { ascending: false })
     setContacts(data ?? [])
@@ -27,6 +27,12 @@ export default function ContactsPage() {
   useEffect(() => { if (!isDemo) load() }, [load])
 
   const handleCreate = async (data: Partial<Contact>) => {
+    if (isDemo) {
+      demoStore.addContact({ ...data, type: data.type ?? 'lead', owner: data.owner ?? 'LL', value: data.value ?? 0 } as Contact)
+      setContacts(demoStore.getContacts())
+      setShowForm(false)
+      return
+    }
     const sb = createClient()
     const { data: { user } } = await sb.auth.getUser()
     await sb.from('contacts').insert({ ...data, user_id: user!.id })
@@ -36,6 +42,7 @@ export default function ContactsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('¿Eliminar este contacto?')) return
+    if (isDemo) { demoStore.deleteContact(id); setContacts(demoStore.getContacts()); return }
     const sb = createClient()
     await sb.from('contacts').delete().eq('id', id)
     load()

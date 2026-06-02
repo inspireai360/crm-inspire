@@ -7,17 +7,17 @@ import { Deal, STAGE_PROB, fmtEuro } from '@/lib/types'
 import KanbanBoard from '@/components/pipeline/KanbanBoard'
 import { PageHead } from '@/components/ui/Card'
 import Icon from '@/components/ui/Icon'
-import { DEMO_DEALS } from '@/lib/demo-data'
+import { demoStore } from '@/lib/demo-store'
 
 const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
 
 export default function PipelinePage() {
-  const [deals, setDeals] = useState<Deal[]>(isDemo ? DEMO_DEALS : [])
+  const [deals, setDeals] = useState<Deal[]>(isDemo ? demoStore.getDeals() : [])
   const [loading, setLoading] = useState(!isDemo)
   const router = useRouter()
 
   const load = useCallback(async () => {
-    if (isDemo) return
+    if (isDemo) { setDeals(demoStore.getDeals()); return }
     const sb = createClient()
     const { data } = await sb.from('deals')
       .select('*, contact:contacts(id,name,type,company:companies(name))')
@@ -38,6 +38,7 @@ export default function PipelinePage() {
 
   const handleStageChange = async (dealId: string, newStage: string) => {
     setDeals(ds => ds.map(d => d.id === dealId ? { ...d, stage: newStage as any } : d))
+    if (isDemo) { demoStore.updateDealStage(dealId, newStage); return }
     const sb = createClient()
     await sb.from('deals').update({ stage: newStage }).eq('id', dealId)
   }
