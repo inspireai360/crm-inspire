@@ -9,6 +9,18 @@ import Icon from '@/components/ui/Icon'
 
 interface Props { onClose: () => void; onCreated: (msg: string) => void }
 
+function Label({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <div className="flex justify-between mb-[7px]">
+        <span className="text-[12.5px] font-[550]" style={{ color: 'var(--t2)' }}>{label}</span>
+        {hint && <span className="text-[12px]" style={{ color: 'var(--t4)' }}>{hint}</span>}
+      </div>
+      {children}
+    </label>
+  )
+}
+
 const OWNERS_LIST = [
   { k: 'LL' as Owner, name: 'Lluc · CMO' },
   { k: 'TI' as Owner, name: 'Timur · CTO' },
@@ -52,16 +64,6 @@ export default function NewDealModal({ onClose, onCreated }: Props) {
   const inputStyle = { background: 'var(--s2)', color: 'var(--t1)', boxShadow: 'inset 0 0 0 1px var(--line2)' }
   const focusOn  = (e: any) => (e.target.style.boxShadow = 'inset 0 0 0 1px var(--accent-l)')
   const focusOff = (e: any) => (e.target.style.boxShadow = 'inset 0 0 0 1px var(--line2)')
-
-  const Label = ({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) => (
-    <label className="block">
-      <div className="flex justify-between mb-[7px]">
-        <span className="text-[12.5px] font-[550]" style={{ color: 'var(--t2)' }}>{label}</span>
-        {hint && <span className="text-[12px]" style={{ color: 'var(--t4)' }}>{hint}</span>}
-      </div>
-      {children}
-    </label>
-  )
 
   const handleCreate = async () => {
     setLoading(true)

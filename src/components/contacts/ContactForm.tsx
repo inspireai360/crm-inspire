@@ -11,6 +11,18 @@ interface Props {
   title: string
 }
 
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label>
+      <div className="text-[12.5px] font-[550] mb-1.5" style={{ color: 'var(--t2)' }}>{label}</div>
+      {children}
+    </label>
+  )
+}
+
+const inputCls = "w-full px-3.5 py-[10px] rounded-[10px] text-[14px] outline-none transition-shadow"
+const inputStyle = { background: 'var(--s2)', color: 'var(--t1)', boxShadow: 'inset 0 0 0 1px var(--line2)' }
+
 export default function ContactForm({ initial = {}, onSubmit, onCancel, title }: Props) {
   const [form, setForm] = useState({
     name: initial.name ?? '',
@@ -26,9 +38,6 @@ export default function ContactForm({ initial = {}, onSubmit, onCancel, title }:
   const [error, setError] = useState('')
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
-  const inputCls = "w-full px-3.5 py-[10px] rounded-[10px] text-[14px] outline-none transition-shadow"
-  const inputStyle = { background: 'var(--s2)', color: 'var(--t1)', boxShadow: 'inset 0 0 0 1px var(--line2)' }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name.trim()) { setError('El nombre es obligatorio'); return }
@@ -36,13 +45,6 @@ export default function ContactForm({ initial = {}, onSubmit, onCancel, title }:
     try { await onSubmit({ ...form, value: parseFloat(form.value) || 0 }) }
     catch (err: any) { setError(err.message); setLoading(false) }
   }
-
-  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <label>
-      <div className="text-[12.5px] font-[550] mb-1.5" style={{ color: 'var(--t2)' }}>{label}</div>
-      {children}
-    </label>
-  )
 
   return (
     <div className="fixed inset-0 z-[100] grid place-items-center p-6 animate-fade-in" style={{ background: 'rgba(5,5,14,0.72)', backdropFilter: 'blur(6px)' }}>
